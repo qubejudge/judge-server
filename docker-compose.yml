@@ -1,0 +1,37 @@
+version: '3.1'
+services:
+  rabbitmq-container:
+    image: rabbitmq:3.11-management
+    hostname: rabbitmq-container
+    ports:
+      - 5672:5672
+      - 15672:15672
+    networks:
+      - judge
+
+  sender-container:
+    image: sender
+    ports:
+      - 8081:8081
+    environment:
+      - spring_rabbitmq_host=rabbitmq-container
+    depends_on:
+      - rabbitmq-container
+    networks:
+      - judge
+
+  consumer-container:
+    image: consumer
+    ports:
+      - 8080:8080
+    environment:
+      - spring_rabbitmq_host=rabbitmq-container
+    depends_on:
+      - rabbitmq-container
+    networks:
+      - judge
+
+networks:
+  judge:
+    external:
+      name: judge
