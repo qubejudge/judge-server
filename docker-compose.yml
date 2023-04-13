@@ -20,10 +20,21 @@ services:
     networks:
       - judge
 
-  consumer-container:
+  consumer-container-1:
     image: consumer
     ports:
       - 8080:8080
+    environment:
+      - spring_rabbitmq_host=rabbitmq-container
+    depends_on:
+      - rabbitmq-container
+    networks:
+      - judge
+  
+  consumer-container-2:
+    image: consumer
+    ports:
+      - 8082:8080
     environment:
       - spring_rabbitmq_host=rabbitmq-container
     depends_on:
