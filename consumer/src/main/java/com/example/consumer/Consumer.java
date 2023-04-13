@@ -2,6 +2,7 @@ package com.example.consumer;
 
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StopWatch;
 
@@ -19,8 +20,11 @@ public class Consumer {
 //        System.out.println("Message received from kedaQ : " + message);
 //    }
 
-    @RabbitListener(queues = "messageq")
-    public void receive(String message) throws InterruptedException {
+    // @Value("${queue.name}")
+    // private String queueName;
+
+    @RabbitListener(queues = "${queue.name}")
+    public String receive(String message) throws InterruptedException {
         System.out.println("Message received from kedaQ : " + message);
         Thread.sleep(5000);
 //        StopWatch watch = new StopWatch();
@@ -29,6 +33,8 @@ public class Consumer {
 //        doWork(in);
 //        watch.stop();
 //        System.out.println("instance  [x] Done in " + watch.getTotalTimeSeconds() + "s");
+        return "Hello from the judge worker";
+        
     }
 
 

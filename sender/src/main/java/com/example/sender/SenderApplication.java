@@ -14,10 +14,10 @@ public class SenderApplication {
 		SpringApplication.run(SenderApplication.class, args);
 	}
 
-	@Bean
-	public Queue queue() {
-		return new Queue("messageq");
-	}
+	// @Bean
+	// public Queue queue() {
+	// 	return new Queue("messageq");
+	// }
 
 
 }

@@ -8,9 +8,12 @@ services:
       - 15672:15672
     networks:
       - judge
+  
+  # callback-queue:
+  #   image: rabbit  
 
   sender-container:
-    image: sender
+    image: judge-server
     ports:
       - 8081:8081
     environment:
@@ -20,10 +23,21 @@ services:
     networks:
       - judge
 
-  consumer-container:
-    image: consumer
+  consumer-container-1:
+    image: judge-worker
     ports:
       - 8080:8080
+    environment:
+      - spring_rabbitmq_host=rabbitmq-container
+    depends_on:
+      - rabbitmq-container
+    networks:
+      - judge
+  
+  consumer-container-2:
+    image: judge-worker
+    ports:
+      - 8082:8080
     environment:
       - spring_rabbitmq_host=rabbitmq-container
     depends_on:
@@ -33,5 +47,3 @@ services:
 
 networks:
   judge:
-    external:
-      name: judge
