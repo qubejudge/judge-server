@@ -8,12 +8,9 @@ services:
       - 15672:15672
     networks:
       - judge
-  
-  # callback-queue:
-  #   image: rabbit  
 
   sender-container:
-    image: judge-server
+    image: sender
     ports:
       - 8081:8081
     environment:
@@ -24,7 +21,7 @@ services:
       - judge
 
   consumer-container-1:
-    image: judge-worker
+    image: consumer
     ports:
       - 8080:8080
     environment:
@@ -35,7 +32,7 @@ services:
       - judge
   
   consumer-container-2:
-    image: judge-worker
+    image: consumer
     ports:
       - 8082:8080
     environment:
@@ -47,3 +44,5 @@ services:
 
 networks:
   judge:
+    external:
+      name: judge

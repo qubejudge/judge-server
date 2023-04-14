@@ -1,14 +1,23 @@
 package com.example.consumer;
 
+import com.example.consumer.dto.SubmissionMessage;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.configurationprocessor.json.JSONException;
+import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StopWatch;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 
@@ -24,53 +33,67 @@ public class Consumer {
     // private String queueName;
 
     @RabbitListener(queues = "${queue.name}")
-    public String receive(String message) throws InterruptedException {
-        System.out.println("Message received from kedaQ : " + message);
-        Thread.sleep(5000);
-//        StopWatch watch = new StopWatch();
-//        watch.start();
-//        System.out.println("instance  [x] Received '" + in + "'");
-//        doWork(in);
-//        watch.stop();
-//        System.out.println("instance  [x] Done in " + watch.getTotalTimeSeconds() + "s");
-        return "Hello from the judge worker";
-        
+    public String receive(String message) throws InterruptedException, JSONException, IOException {
+//        System.out.println("Message received from kedaQ : " + message);
+        Gson gson = new Gson();
+        SubmissionMessage obj = gson.fromJson(message, SubmissionMessage.class);
+
+        File convertFile = new File("solution." + obj.getFileType());
+        convertFile.createNewFile();
+        FileOutputStream fout = new FileOutputStream(convertFile);
+        fout.write(obj.getFile());
+        fout.close();
+
+        executeCode(obj.getId(), obj.getFileType());
+
+        Files.deleteIfExists(Path.of("solution." + obj.getFileType()));
+        Files.deleteIfExists(Path.of("solution"));
+        Files.deleteIfExists(Path.of("out.txt"));
+        Files.deleteIfExists(Path.of("timeMem.txt"));
+
+        return "code executed successfully";
     }
 
 
-    private void doWork(String in) throws InterruptedException {
-        Thread.sleep(10000);
+    //['./app/run.sh', 'cpp', 'out.txt', 'timeMem.txt', '10', '256']
+    private void executeCode(String id, String fileType) throws InterruptedException {
         ProcessBuilder processBuilder
                 = new ProcessBuilder();
-//		in = "ls";
-        List<String> builderList = List.of(in.split(" "));
-        System.out.println(builderList);
-        // add the list of commands to a list
-//        try {
-            // Using the list , trigger the command
-//            processBuilder.command(builderList);
-//            Process process = processBuilder.start();
-//
-//            // To read the output list
-//            BufferedReader reader
-//                    = new BufferedReader(new InputStreamReader(
-//                    process.getInputStream()));
-//
-//            String line;
-//            while ((line = reader.readLine()) != null) {
-//                System.out.println(line);
-//            }
-//
-//            int exitCode = process.waitFor();
-//            System.out.println("\nExited with error code : "
-//                    + exitCode);
-//        }
-//        catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
+
+        List<String> builderList = new ArrayList<String>();
+        builderList.add("./run.sh");
+        builderList.add(fileType);
+        builderList.add("out.txt");
+        builderList.add("timeMem.txt");
+        builderList.add("10");
+        builderList.add("256");
+
+        try {
+
+            processBuilder.command(builderList);
+            Process process = processBuilder.start();
+
+            BufferedReader reader
+                    = new BufferedReader(new InputStreamReader(
+                    process.getInputStream()));
+
+            String line;
+            while ((line = reader.readLine()) != null) {
+                System.out.println(line);
+            }
+
+            int exitCode = process.waitFor();
+            System.out.println("\nExited with error code : "
+                    + exitCode);
+
+
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+        catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
 
     }
