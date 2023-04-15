@@ -1,5 +1,27 @@
-version: '3.1'
+version: '3.7'
+# volumes:
+#   mysqldb:
+
 services:
+  mysqldb:
+      image: mysql/mysql-server:5.7
+      restart: always
+      container_name: mysqldb
+      environment:
+        - MYSQL_ROOT_PASSWORD=Test@123
+        - MYSQL_DATABASE=qubejudge
+        # So you don't have to use root, but you can if you like
+        - MYSQL_USER=qubejudge
+        # You can use whatever password you like
+        - MYSQL_PASSWORD=qubejudge@sql1
+        # Password for root access
+  
+      ports:
+        - '3307:3306'
+      expose:
+        - '3307'
+      networks:
+        - judge
   rabbitmq-container:
     image: rabbitmq:3.11-management
     hostname: rabbitmq-container
@@ -15,8 +37,14 @@ services:
       - 8081:8081
     environment:
       - spring_rabbitmq_host=rabbitmq-container
+      - spring.datasource.url= jdbc:mysql://mysqldb:3306/qubejudge
+      - spring.datasource.username=qubejudge
+      - spring.datasource.password=qubejudge@sql1
     depends_on:
       - rabbitmq-container
+      - mysqldb
+    restart: 
+      on-failure:5
     networks:
       - judge
 
@@ -31,16 +59,17 @@ services:
     networks:
       - judge
   
-  consumer-container-2:
-    image: consumer
-    ports:
-      - 8082:8080
-    environment:
-      - spring_rabbitmq_host=rabbitmq-container
-    depends_on:
-      - rabbitmq-container
-    networks:
-      - judge
+  # consumer-container-2:
+  #   image: consumer
+  #   ports:
+  #     - 8082:8080
+  #   environment:
+  #     - spring_rabbitmq_host=rabbitmq-container
+  #   depends_on:
+  #     - rabbitmq-container
+  #     - mysqldb
+  #   networks:
+  #     - judge
 
 networks:
   judge:
