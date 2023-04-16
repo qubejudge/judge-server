@@ -1,6 +1,7 @@
 package com.example.sender.services;
 
 
+import com.example.sender.controller.SocketClient;
 import com.example.sender.dto.SubmissionMessage;
 import com.example.sender.dto.SubmissionResponse;
 import com.example.sender.entity.Submission;
@@ -15,6 +16,8 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -36,6 +39,11 @@ public class SubmissionService {
 
     @Autowired
     private AsyncRabbitTemplate asyncRabbitTemplate;
+
+    @Autowired
+    SimpMessagingTemplate template;
+
+    private SocketClient socketClient;
 
     private final SubmissionRespository submissionRespository;
 
@@ -72,11 +80,18 @@ public class SubmissionService {
         rabbitConverterFuture.whenComplete((result, ex) -> {
             if(ex == null){
                 System.out.println("Response from worker: " + result);
+                successOperation(result, submission.getSubmission_id());
             }else{
                 System.out.println("Worker could not perform operation");
             }
         });
 
         return new ResponseEntity<>(SubmissionResponse.builder().id(submission.getSubmission_id()).build(), HttpStatusCode.valueOf(200));
+    }
+
+    public void successOperation(String result, String submissionId)
+    {
+        System.out.println("piiii");
+        template.convertAndSend("/topic/message/" + submissionId, result);
     }
 }

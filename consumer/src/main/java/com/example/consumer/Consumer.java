@@ -48,7 +48,7 @@ public class Consumer {
 
         Files.deleteIfExists(Path.of("solution." + obj.getFileType()));
         Files.deleteIfExists(Path.of("solution"));
-        Files.deleteIfExists(Path.of("out.txt"));
+//        Files.deleteIfExists(Path.of("out.txt"));
         Files.deleteIfExists(Path.of("timeMem.txt"));
 
         return "code executed successfully";
@@ -59,7 +59,7 @@ public class Consumer {
     private void executeCode(String id, String fileType) throws InterruptedException {
         ProcessBuilder processBuilder
                 = new ProcessBuilder();
-
+        Thread.sleep(10000);
         List<String> builderList = new ArrayList<String>();
         builderList.add("./run.sh");
         builderList.add(fileType);

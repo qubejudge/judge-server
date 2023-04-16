@@ -13,6 +13,7 @@ import java.io.IOException;
 @RestController
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor
+@CrossOrigin
 public class SubmissionController {
 
     @Autowired
@@ -22,5 +23,7 @@ public class SubmissionController {
     public ResponseEntity<SubmissionResponse> submitFile(@RequestParam("file")MultipartFile file) throws IOException {
         return submissionService.submitFile(file);
     }
+
+
 
 }
