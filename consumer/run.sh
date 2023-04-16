@@ -25,7 +25,8 @@ then {
         initMem=${memArr[1]}
         g++ -o solution solution.cpp &> $2 && {
             {
-                cat testcase.txt | gtime -f "%e %M" -o $3 gtimeout $4s ./solution &> $2
+                cat testcase.txt | /usr/bin/time -f "%e %M" -o $3 timeout $4s ./solution &> $2
+                # cat testcase.txt | ts=$(date +%s%N) -o $3 timeout $4s ./solution tt=$((($(date +%s%N) - $ts)/1000000)) ; echo "Time taken: $tt milliseconds"
             } || {
                 RTE=1
             }
@@ -69,31 +70,34 @@ then
 
     time=${arr[0]}
     memory=${arr[1]}
-
+    # echo "time" 
+    # echo $time
+    # echo "memory"
+    # echo $memory
     time=$(bc -l <<<"${time}*1000")
     memory=$(bc -l <<<"(${memory}/1)-(${initMem}/1)")
 
     timeDiff=$(bc -l <<<"($4*1000)-${time}")
     if [[ $(echo "$timeDiff <= 0" | bc -l) -eq 1 ]]
     then
-        echo "TLE" >> $2
+        echo "TLE" >> $6
     fi
 
     memDiff=$(bc -l <<<"($5*1000)-(${memory}/1)")
     if [[ $(echo "$memDiff <= 0" | bc -l) -eq 1 ]]
     then
-        echo "MLE" >> $2
+        echo "MLE" >> $6
     fi
 fi
 
 if [[ $CE -eq 1 ]]
 then
-    echo "COMPILATION ERROR" >> $2
+    echo "CE" >> $6
 fi
 
 if [[ $RTE -eq 1 ]]
 then
-    echo "RUNTIME ERROR" >> $2
+    echo "RTE" >> $6
 fi
 
 

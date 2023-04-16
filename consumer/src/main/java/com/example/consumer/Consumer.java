@@ -1,21 +1,23 @@
 package com.example.consumer;
 
 import com.example.consumer.dto.SubmissionMessage;
+import com.example.consumer.dto.WorkerResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Value;
-
-import org.json.JSONException;
+//import org.springframework.boot.configurationprocessor.json.JSONException;
+import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StopWatch;
-
+import org.json.JSONException;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
@@ -44,19 +46,64 @@ public class Consumer {
         fout.write(obj.getFile());
         fout.close();
 
-        executeCode(obj.getId(), obj.getFileType());
+        int exitCode = executeCode(obj.getId(), obj.getFileType());
+        String output = "";
+        String errorCode = "";
+        Double time = 0.0;
+        int mem = 0;
+        if(exitCode == 0){
+            output = Files.readString(Paths.get("out.txt"));
+            //return output;
+            BufferedReader err_reader, timeMem_reader;
+            try {
+                err_reader = new BufferedReader(new FileReader("errors.txt"));
+                String line = err_reader.readLine();
+                if(line != null){
+                    errorCode = line;
+                }
+                err_reader.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
-        Files.deleteIfExists(Path.of("solution." + obj.getFileType()));
+            try {
+                timeMem_reader = new BufferedReader(new FileReader("timeMem.txt"));
+                String line = timeMem_reader.readLine();
+                if(line != null){
+                    String[] splited = line.split("\\s+");
+                    if(splited[0].equals("Command")){
+                        line = timeMem_reader.readLine();
+                    }
+                    splited = line.split("\\s+");
+                    if(line != null){
+                        time = Double.parseDouble(splited[0]);
+                        mem = Integer.parseInt(splited[1]);
+                    }
+                }
+                timeMem_reader.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }else{
+            return "Unable to run code!";
+        }
+        WorkerResponse workerResponse = WorkerResponse.builder().out(output).memory(mem).time(time).errorCode(errorCode).build();
+        String responseJson = gson.toJson(workerResponse);
+        cleanup(obj.getFileType());
+        return responseJson;
+    }
+
+    private void cleanup(String sol_ext) throws IOException {
+        Files.deleteIfExists(Path.of("solution." + sol_ext));
         Files.deleteIfExists(Path.of("solution"));
-//        Files.deleteIfExists(Path.of("out.txt"));
+        Files.deleteIfExists(Path.of("out.txt"));
         Files.deleteIfExists(Path.of("timeMem.txt"));
-
-        return "code executed successfully";
+        Files.deleteIfExists(Path.of("errors.txt"));
     }
 
 
     //['./app/run.sh', 'cpp', 'out.txt', 'timeMem.txt', '10', '256']
-    private void executeCode(String id, String fileType) throws InterruptedException {
+    private int executeCode(String id, String fileType) throws InterruptedException {
         ProcessBuilder processBuilder
                 = new ProcessBuilder();
         Thread.sleep(10000);
@@ -67,6 +114,7 @@ public class Consumer {
         builderList.add("timeMem.txt");
         builderList.add("10");
         builderList.add("256");
+        builderList.add("errors.txt");
 
         try {
 
@@ -85,7 +133,7 @@ public class Consumer {
             int exitCode = process.waitFor();
             System.out.println("\nExited with error code : "
                     + exitCode);
-
+            return exitCode;
 
         }
         catch (IOException e) {
@@ -95,7 +143,7 @@ public class Consumer {
             e.printStackTrace();
         }
 
-
+        return -1;
     }
 
 }
