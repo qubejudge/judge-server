@@ -1,3 +1,6 @@
+FROM maven:3.6.1-jdk-8-alpine AS MAVEN_BUILD
+COPY ./ ./
+RUN mvn clean package
 FROM openjdk:17.0.1-jdk-slim
 VOLUME /tmp
 RUN apt-get update && apt install -y g++ && apt install time
