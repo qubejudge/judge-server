@@ -3,6 +3,7 @@ package com.example.sender.services;
 
 import com.example.sender.dto.SubmissionMessage;
 import com.example.sender.dto.SubmissionResponse;
+import com.example.sender.dto.WorkerResponse;
 import com.example.sender.entity.Submission;
 import com.example.sender.repository.SubmissionRespository;
 import com.google.gson.Gson;
@@ -71,7 +72,9 @@ public class SubmissionService {
 
         rabbitConverterFuture.whenComplete((result, ex) -> {
             if(ex == null){
-                System.out.println("Response from worker: " + result);
+                WorkerResponse workerResponse = gson.fromJson(result, WorkerResponse.class);
+                System.out.print(workerResponse);
+                //System.out.println("Response from worker: " + result);
             }else{
                 System.out.println("Worker could not perform operation");
             }
