@@ -15,10 +15,10 @@ public class ConsumerApplication {
 	}
 
 
-	@Bean
-	public Queue queue() {
-		return new Queue("messageq");
-	}
+	// @Bean
+	// public Queue queue() {
+	// 	return new Queue("messageq");
+	// }
 
 
 

@@ -7,17 +7,17 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 
-@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class, SecurityAutoConfiguration.class })
+@SpringBootApplication(exclude = { SecurityAutoConfiguration.class })
 public class SenderApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(SenderApplication.class, args);
 	}
 
-	@Bean
-	public Queue queue() {
-		return new Queue("messageq");
-	}
+	// @Bean
+	// public Queue queue() {
+	// 	return new Queue("messageq");
+	// }
 
 
 }
