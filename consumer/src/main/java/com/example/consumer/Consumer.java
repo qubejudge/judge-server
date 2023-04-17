@@ -76,8 +76,17 @@ public class Consumer {
                     }
                     splited = line.split("\\s+");
                     if(line != null){
-                        time = Double.parseDouble(splited[0]);
-                        mem = Integer.parseInt(splited[1]);
+                        try {
+                            time = Double.parseDouble(splited[0]);
+                        } catch (Exception e) {
+                            // TODO: handle exception
+                        }
+                        
+                        try {
+                            mem = Integer.parseInt(splited[1]);
+                        } catch (Exception e) {
+                            // TODO: handle exception
+                        }
                     }
                 }
                 timeMem_reader.close();
