@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: judge-consumer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: judge-consumer
+  template:
+    metadata:
+      labels:
+        app: judge-consumer
+    spec:
+      containers:
+      - name: judge-consumer
+        image: kernelpanic77/consumer
+        imagePullPolicy: Never
+        env:
+        - name: spring_rabbitmq_host
+          value: rabbitmq
+        # resources:
+        #   limits:
+        #     memory: "128Mi"
+        #     cpu: "500m"
+        ports:
+        - containerPort: 8080
