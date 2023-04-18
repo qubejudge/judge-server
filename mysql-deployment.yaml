@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+spec:
+  selector:
+    matchLabels:
+      app: mysql
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+      - name: mysql
+        image: mysql
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: Test@123
+        - name: MYSQL_DATABASE 
+          value: qubejudge
+        - name: MYSQL_USER
+          value: qubejudge
+        - name: MYSQL_PASSWORD
+          value: qubejudge@sql1
+        ports:
+        - containerPort: 3306
+          name: mysql
