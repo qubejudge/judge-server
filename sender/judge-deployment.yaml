@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: judge-server
+spec:
+  selector:
+    matchLabels:
+      app: judge-server
+  template:
+    metadata:
+      labels:
+        app: judge-server
+    spec:
+      containers:
+      - name: judge-server
+        image: qubejudge/sender
+        imagePullPolicy: Never
+        env:
+          - name: spring_rabbitmq_host
+            value: rabbitmq
+          - name: spring.datasource.url
+            value: jdbc:mysql://mysqldb:3306/qubejudge
+          - name: spring.datasource.username
+            value: qubejudge
+          - name: spring.datasource.password
+            value: qubejudge@sql1
+        # resources:
+        #   limits:
+        #     memory: "128Mi"
+        #     cpu: "500m"
+        ports:
+        - containerPort: 8081
