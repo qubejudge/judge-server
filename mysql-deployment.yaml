@@ -15,7 +15,8 @@ spec:
     spec:
       containers:
       - name: mysql
-        image: mysql
+        image: amd64/mysql
+        imagePullPolicy: Always
         env:
         - name: MYSQL_ROOT_PASSWORD
           value: Test@123
