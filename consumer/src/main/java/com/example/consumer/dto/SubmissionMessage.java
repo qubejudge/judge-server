@@ -12,6 +12,6 @@ import lombok.NoArgsConstructor;
 public class SubmissionMessage {
     private String id;
     private byte[] file;
-
     private String fileType;
+    private String input;
 }

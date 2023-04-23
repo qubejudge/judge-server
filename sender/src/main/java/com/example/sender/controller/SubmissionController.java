@@ -27,8 +27,8 @@ public class SubmissionController {
     }
 
     @PostMapping("/submit-file")
-    public ResponseEntity<SubmissionResponse> submitFile(@RequestParam("file")MultipartFile file) throws IOException {
-        return submissionService.submitFile(file);
+    public ResponseEntity<SubmissionResponse> submitFile(@RequestParam("file")MultipartFile file, @RequestParam String input, @RequestParam String lang) throws IOException {
+        return submissionService.submitFile(file, input, lang);
     }
 
 

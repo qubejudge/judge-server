@@ -5,6 +5,9 @@ import com.example.consumer.dto.WorkerResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
+
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,34 +27,39 @@ import java.util.List;
 
 
 @Component
+@Slf4j
 public class Consumer {
 
-//    @RabbitListener(queues = "messageq")
-//    public void listen(String message) {
-//        System.out.println("Message received from kedaQ : " + message);
-//    }
-
-    // @Value("${queue.name}")
-    // private String queueName;
 
     @RabbitListener(queues = "${queue.name}")
     public String receive(String message) throws InterruptedException, JSONException, IOException {
-//        System.out.println("Message received from kedaQ : " + message);
+        //System.out.println("Message received from kedaQ : " + message);
+        
         Gson gson = new Gson();
         SubmissionMessage obj = gson.fromJson(message, SubmissionMessage.class);
+        log.info("Worker has received Submission Task {} from the judge-master", obj.getId());
 
+        log.info("Worker is processing submission {} in lang {}", obj.getId(), obj.getFileType());
         File convertFile = new File("solution." + obj.getFileType());
         convertFile.createNewFile();
         FileOutputStream fout = new FileOutputStream(convertFile);
         fout.write(obj.getFile());
         fout.close();
 
+        // Write input to testcase.txt
+        File testcaseFileObj = new File("testcase.txt");
+        BufferedWriter writer = new BufferedWriter(new FileWriter(testcaseFileObj));
+        writer.append(obj.getInput());
+        writer.close();
+
+        log.info("Worker is compiling and executing, submission {}", obj.getId());
         int exitCode = executeCode(obj.getId(), obj.getFileType());
         String output = "";
         String errorCode = "";
         Double time = 0.0;
         int mem = 0;
         if(exitCode == 0){
+            log.info("Compilation and execution completed for submission {}", obj.getId());
             output = Files.readString(Paths.get("out.txt"));
             //return output;
             BufferedReader err_reader, timeMem_reader;
@@ -63,7 +71,7 @@ public class Consumer {
                 }
                 err_reader.close();
             } catch (IOException e) {
-                e.printStackTrace();
+                log.info("No error file created for submission {}", obj.getId());
             }
 
             try {
@@ -91,14 +99,16 @@ public class Consumer {
                 }
                 timeMem_reader.close();
             } catch (IOException e) {
-                e.printStackTrace();
+                log.error("Unable to process time and memory output for submission {}", obj.getId());
             }
         }else{
+            log.error("Unable to compile and execute submission {}", obj.getId());
             return "Unable to run code!";
         }
         WorkerResponse workerResponse = WorkerResponse.builder().out(output).memory(mem).time(time).errorCode(errorCode).build();
         String responseJson = gson.toJson(workerResponse);
         cleanup(obj.getFileType());
+        log.info("Clean up for submission {} completed, sending callback to judge-master", obj.getId());
         return responseJson;
     }
 
@@ -128,7 +138,9 @@ public class Consumer {
         try {
 
             processBuilder.command(builderList);
+            StopWatch watch = new StopWatch();
             Process process = processBuilder.start();
+            watch.start();
 
             BufferedReader reader
                     = new BufferedReader(new InputStreamReader(
@@ -136,12 +148,12 @@ public class Consumer {
 
             String line;
             while ((line = reader.readLine()) != null) {
-                System.out.println(line);
+                log.info(line);
             }
 
             int exitCode = process.waitFor();
-            System.out.println("\nExited with error code : "
-                    + exitCode);
+            watch.stop();
+            log.info("Time taken by submission {} is {}", id, watch.getTotalTimeMillis());
             return exitCode;
 
         }
