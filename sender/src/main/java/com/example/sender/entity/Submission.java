@@ -16,6 +16,14 @@ import org.springframework.boot.context.properties.bind.DefaultValue;
 public class Submission {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private String submission_id;
-    private String submission_status;
+    private String submissionId;
+    private String submissionStatus;
+    private String userId;
+    private String filename;
+    private String filetype;
+    private String lang;
+    private String errorCode;
+    private Double timeTaken;
+    private Integer memoryUse;
+    private String output;
 }

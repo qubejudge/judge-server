@@ -1,6 +1,0 @@
-solution.cpp:6:15: error: expected ';' after return statement
-    return 128
-              ^
-              ;
-1 error generated.
-COMPILATION ERROR

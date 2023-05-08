@@ -1,6 +1,9 @@
 package com.example.sender.controller;
 
+import com.example.sender.dto.ListSubmissions;
+import com.example.sender.dto.SubmissionDataResponse;
 import com.example.sender.dto.SubmissionResponse;
+import com.example.sender.entity.Submission;
 import com.example.sender.services.SubmissionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,5 +35,13 @@ public class SubmissionController {
     }
 
 
+    @GetMapping("/submissions")
+    public ResponseEntity<ListSubmissions> listSubmissions(@RequestParam String userID){
+        return submissionService.getSubmissionsByUserID(userID);
+    }
 
+    @GetMapping("/submission-code")
+    public ResponseEntity<SubmissionDataResponse> fetchSubmissionCode(@RequestParam String submissionID){
+        return submissionService.getSubmissionDatabySubmissionID(submissionID);
+    } 
 }

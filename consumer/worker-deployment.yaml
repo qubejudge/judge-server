@@ -13,8 +13,8 @@ spec:
     spec:
       containers:
       - name: judge-consumer
-        image: pranu2502/qubejudge-consumer:arm64
-        imagePullPolicy: Always
+        image: qubejudge/worker
+        imagePullPolicy: Never
         env:
         - name: spring_rabbitmq_host
           value: rabbitmq
