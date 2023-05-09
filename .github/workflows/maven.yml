@@ -40,6 +40,7 @@ jobs:
         with:
           java-version: 17
 #       - run: mvn -B package --file pom.xml -DskipTests
+      - run: ls consumer
       - run: ls
       - run: mkdir staging && cp target/*.jar staging
       - uses: actions/upload-artifact@v1
