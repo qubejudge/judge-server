@@ -40,7 +40,7 @@ jobs:
         with:
           java-version: 17
 #       - run: mvn -B package --file pom.xml -DskipTests
-      - run: mkdir staging && cp target/*SNAPSHOT.jar staging
+      - run: mkdir staging && cp target/*.jar staging
       - uses: actions/upload-artifact@v1
         with:
           name: Package
