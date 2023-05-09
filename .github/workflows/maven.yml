@@ -28,9 +28,10 @@ jobs:
         distribution: 'temurin'
         cache: maven
     - name: Build sender with Maven
-      run: mvn -B package --file ./sender/pom.xml
+      run: mvn clean install --file ./sender/pom.xml
     - name: Build consumer with Maven
-      run: mvn -B package --file ./consumer/pom.xml
+      run: mvn clean install --file ./consumer/pom.xml
+    - run: ls consumer
   publish-job:
     runs-on: ubuntu-latest
     needs: [build]
