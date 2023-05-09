@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: qubejudge-frontend
+spec:
+  selector:
+    matchLabels:
+      app: qubejudge-frontend
+  template:
+    metadata:
+      labels:
+        app: qubejudge-frontend
+    spec:
+      containers:
+      - name: qubejudge-frontend
+        image: pranu2502/qubejudge-frontend:amd64
+        imagePullPolicy: Always
+        # resources:
+        #   limits:
+        #     memory: "128Mi"
+        #     cpu: "500m"
+        ports:
+        - containerPort: 3000

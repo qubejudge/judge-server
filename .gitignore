@@ -4,6 +4,8 @@
 # Compiled class file
 *.class
 
+.vscode/settings.json
+
 # Log file
 *.log
 
