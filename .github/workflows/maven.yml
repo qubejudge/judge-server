@@ -80,10 +80,12 @@ jobs:
         path: sender/target/sender-0.0.1-SNAPSHOT.jar
     - run: ls consumer
     - run: ls sender
+    - run: cd consumer
     - name: Build the Docker image for consumer - amd64 
       run: docker build . --file ./consumer/Dockerfile --tag qubejudge-consumer:amd64
 # #       - name: Build the Docker image for sender - arm64
 # #         run: docker buildx build --platform=darwin . --file ./sender/Dockerfile --tag qubejudge-sender:arm64
+    - run: cd ../sender
     - name: Build the Docker image for sender - amd64 
       run: docker build . --file ./sender/Dockerfile --tag qubejudge-sender:amd64
 
