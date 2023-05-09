@@ -83,7 +83,7 @@ jobs:
 #     - run: cd consumer
 #     - run: ls
     - name: Build the Docker image for consumer - amd64 
-      run: docker build ./consumer --file ./Dockerfile --tag qubejudge-consumer:amd64
+      run: docker build ./consumer --file ./consumer/Dockerfile --tag qubejudge-consumer:amd64
 # #       - name: Build the Docker image for sender - arm64
 # #         run: docker buildx build --platform=darwin . --file ./sender/Dockerfile --tag qubejudge-sender:arm64
 #     - run: cd ../sender
