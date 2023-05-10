@@ -138,7 +138,7 @@ public class SubmissionService {
             }
         });
 
-        return new ResponseEntity<>(SubmissionResponse.builder().id(submission.getSubmissionId()).build(), HttpStatusCode.valueOf(200));
+        return new ResponseEntity<>(SubmissionResponse.builder().id(submission.getSubmissionId()).message("Submitted Successfully").build(), HttpStatusCode.valueOf(200));
     }
 
     public void successOperation(WorkerResponse workerResponse, String submissionId)

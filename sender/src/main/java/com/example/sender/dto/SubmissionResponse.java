@@ -13,4 +13,5 @@ import org.springframework.http.HttpStatusCode;
 @AllArgsConstructor
 public class SubmissionResponse {
     private String id;
+    private String message;
 }
