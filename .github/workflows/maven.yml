@@ -82,11 +82,17 @@ jobs:
     needs: [build-docker-image]
     steps:
     - uses: actions/checkout@v3
+    - name: Azure Login
+      uses: Azure/login@v1.4.6
+      with:
+        # Paste output of `az ad sp create-for-rbac` as value of secret variable: AZURE_CREDENTIALS
+        creds: '${{ secrets.AZURE_CREDENTIALS }}'
+
     - name: Azure Kubernetes set context
       uses: Azure/aks-set-context@v3.0
       with:
         # Resource Group Name
-        resource-group: qubejudgeresourcegroup
+        resource-group: qubejudgeresource
         # AKS Cluster Name
         cluster-name: qubejudgecluster
 #         # AKS Cluster Subscription
