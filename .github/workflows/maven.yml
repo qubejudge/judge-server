@@ -86,15 +86,33 @@ jobs:
       uses: Azure/login@v1.4.6
       with:
         # Paste output of `az ad sp create-for-rbac` as value of secret variable: AZURE_CREDENTIALS
-        creds: '${{ secrets.AZURE_CREDENTIALS }}'
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
 
     - name: Azure Kubernetes set context
       uses: Azure/aks-set-context@v3.0
       with:
         # Resource Group Name
-        resource-group: qubejudgeresource
+        resource-group: ${{ secrets.QUBEJUDGE_RESOURCE_GROUP }}
         # AKS Cluster Name
-        cluster-name: qubejudgecluster
+        cluster-name: ${{ secrets.QUBEJUDGE_CLUSTER }}
+    - name: Setup kubectl
+      id: install-kubectl
+      uses: azure/setup-kubectl@v3
+    - name: Deploy to AKS
+      id: deploy-aks
+      uses: Azure/k8s-deploy@v4
+      with:
+        namespace: 'default'
+        manifests: |
+              mysql-deployment.yaml
+              mysql-service.yaml
+              rabbitmq-deployment.yml
+              rabbitmq-service.yaml
+              ./consumer/worker-deployment.yaml
+              ./sender/judge-deployment.yaml
+              ./sender/judge-service.yaml
+#         images: 
+#           pull-images: true 
 #         # AKS Cluster Subscription
 #         subscription: # optional
 #         # Get cluster admin credentials. Values: true or false
