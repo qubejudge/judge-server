@@ -106,7 +106,7 @@ jobs:
         manifests: |
               mysql-deployment.yaml
               mysql-service.yaml
-              rabbitmq-deployment.yml
+              rabbitmq-deployment.yaml
               rabbitmq-service.yaml
               ./consumer/worker-deployment.yaml
               ./sender/judge-deployment.yaml
