@@ -28,10 +28,95 @@ jobs:
         distribution: 'temurin'
         cache: maven
     - name: Build sender with Maven
-      run: mvn -B package --file ./sender/pom.xml
+      run: mvn clean install --file ./sender/pom.xml
     - name: Build consumer with Maven
-      run: mvn -B package --file ./consumer/pom.xml
+      run: mvn clean install --file ./consumer/pom.xml
+    - run: ls consumer
+    - uses: actions/upload-artifact@master
+      with:
+        name: consumer-0.0.1-SNAPSHOT.jar
+        path: consumer/target/consumer-0.0.1-SNAPSHOT.jar
+    - uses: actions/upload-artifact@master
+      with:
+        name: sender-0.0.1-SNAPSHOT.jar
+        path: sender/target/sender-0.0.1-SNAPSHOT.jar
 
-    # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
-    - name: Update dependency graph
-      uses: advanced-security/maven-dependency-submission-action@571e99aab1055c2e71a1e2309b9691de18d6b7d6
+  build-docker-image:
+    runs-on: ubuntu-latest
+    needs: [build]
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: maven
+    - uses: actions/download-artifact@master
+      with: 
+        name: consumer-0.0.1-SNAPSHOT.jar
+        path: consumer/target/consumer-0.0.1-SNAPSHOT.jar
+    - uses: actions/download-artifact@master
+      with: 
+        name: sender-0.0.1-SNAPSHOT.jar
+        path: sender/target/sender-0.0.1-SNAPSHOT.jar
+    - run: ls consumer
+    - run: ls sender
+
+    - name: Build the Docker image for consumer - amd64 
+      run: docker build ./consumer --file ./consumer/Dockerfile --tag pranu2502/qubejudge-consumer:amd64
+
+    - name: Build the Docker image for sender - amd64 
+      run: docker build ./sender --file ./sender/Dockerfile --tag pranu2502/qubejudge-sender:amd64
+    - name: Login to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKER_HUB_USERNAME }}
+        password: ${{ secrets.DOCKER_HUB_PASSWORD }}
+    - name: Push consumer Image
+      run: docker push pranu2502/qubejudge-consumer:amd64
+    - name: Push sender Image
+      run: docker push pranu2502/qubejudge-sender:amd64
+  deployment:
+    runs-on: ubuntu-latest
+    needs: [build-docker-image]
+    steps:
+    - uses: actions/checkout@v3
+    - name: Azure Login
+      uses: Azure/login@v1.4.6
+      with:
+        # Paste output of `az ad sp create-for-rbac` as value of secret variable: AZURE_CREDENTIALS
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Azure Kubernetes set context
+      uses: Azure/aks-set-context@v3.0
+      with:
+        # Resource Group Name
+        resource-group: ${{ secrets.QUBEJUDGE_RESOURCE_GROUP }}
+        # AKS Cluster Name
+        cluster-name: ${{ secrets.QUBEJUDGE_CLUSTER }}
+    - name: Setup kubectl
+      id: install-kubectl
+      uses: azure/setup-kubectl@v3
+    - name: Deploy to AKS
+      id: deploy-aks
+      uses: Azure/k8s-deploy@v4
+      with:
+        namespace: 'default'
+        manifests: |
+              mysql-deployment.yaml
+              mysql-service.yaml
+              rabbitmq-deployment.yaml
+              rabbitmq-service.yaml
+              ./consumer/worker-deployment.yaml
+              ./sender/judge-deployment.yaml
+              ./sender/judge-service.yaml
+#         images: 
+#           pull-images: true 
+#         # AKS Cluster Subscription
+#         subscription: # optional
+#         # Get cluster admin credentials. Values: true or false
+#         admin: # optional
+#         # Enables kubelogin for non-admin user scenario. Values: true or false
+#         use-kubelogin: # optional
+        
