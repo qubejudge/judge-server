@@ -86,6 +86,11 @@
 			<artifactId>spring-rabbit-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt-api</artifactId>
+			<version>0.11.5</version>
+		</dependency>
 <!--		<dependency>-->
 <!--			<groupId>org.springframework.security</groupId>-->
 <!--			<artifactId>spring-security-test</artifactId>-->
