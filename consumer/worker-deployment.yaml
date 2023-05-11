@@ -13,7 +13,7 @@ spec:
     spec:
       containers:
       - name: judge-consumer
-        image: pranu2502/qubejudge-consumer:amd64
+        image: pranu2502/qubejudge-consumer-amd64:latest
         imagePullPolicy: Always
         env:
         - name: spring_rabbitmq_host
