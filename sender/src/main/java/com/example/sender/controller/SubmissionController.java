@@ -36,8 +36,8 @@ public class SubmissionController {
 
 
     @GetMapping("/submissions")
-    public ResponseEntity<ListSubmissions> listSubmissions(@RequestParam String userID){
-        return submissionService.getSubmissionsByUserID(userID);
+    public ResponseEntity<ListSubmissions> listSubmissions(){
+        return submissionService.getSubmissionsByUserID();
     }
 
     @GetMapping("/submission-code")

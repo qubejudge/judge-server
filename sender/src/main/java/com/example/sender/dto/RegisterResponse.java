@@ -13,4 +13,5 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class RegisterResponse {
     private String token;
     private String message;
+    private String name;
 }

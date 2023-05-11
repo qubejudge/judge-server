@@ -14,4 +14,6 @@ import org.springframework.http.HttpStatusCode;
 public class SubmissionResponse {
     private String id;
     private String message;
+    private Boolean anonymous;
+    private String anonymousId;
 }

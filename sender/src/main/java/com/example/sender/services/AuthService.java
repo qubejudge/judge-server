@@ -26,6 +26,14 @@ public class AuthService {
 
     public ResponseEntity<RegisterResponse>register(RegisterRequest request)
     {
+//        try
+        var checkUser = userRepository.findByEmail(request.getEmail());
+        System.out.println(checkUser);
+        if(checkUser.isPresent())
+        {
+            System.out.println("yayyy");
+            return new ResponseEntity<>(RegisterResponse.builder().message("User Already exists").build(),HttpStatusCode.valueOf(403));
+        }
         var user = User.builder()
                 .role(Role.USER)
                 .email(request.getEmail())
@@ -42,7 +50,7 @@ public class AuthService {
 
         var jwtToken = jwtService.generateToken(user);
 
-        return new ResponseEntity<>(RegisterResponse.builder().token(jwtToken).message("User Registered Successfully").build(), HttpStatusCode.valueOf(200));
+        return new ResponseEntity<>(RegisterResponse.builder().token(jwtToken).message("User Registered Successfully").name(request.getName()).build(), HttpStatusCode.valueOf(200));
     }
 
     public ResponseEntity<LoginResponse> login(LoginRequest request) {
@@ -54,7 +62,7 @@ public class AuthService {
         }
 
         var jwtToken = jwtService.generateToken(user);
-        return new ResponseEntity<>(LoginResponse.builder().token(jwtToken).message("User Logged in Successfully").build(), HttpStatusCode.valueOf(200));
+        return new ResponseEntity<>(LoginResponse.builder().token(jwtToken).message("User Logged in Successfully").name(user.getName()).build(), HttpStatusCode.valueOf(200));
 
     }
 }

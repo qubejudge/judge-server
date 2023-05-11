@@ -7,8 +7,10 @@ import com.example.sender.dto.SubmissionDataResponse;
 import com.example.sender.dto.SubmissionMessage;
 import com.example.sender.dto.SubmissionResponse;
 import com.example.sender.dto.WorkerResponse;
+import com.example.sender.entity.Role;
 import com.example.sender.entity.Submission;
 import com.example.sender.entity.SubmissionData;
+import com.example.sender.entity.User;
 import com.example.sender.repository.SubmissionDataRepository;
 import com.example.sender.repository.SubmissionRespository;
 import com.google.gson.Gson;
@@ -25,7 +27,9 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.web.server.ServerHttpSecurity.HttpsRedirectSpec;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -37,6 +41,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -60,6 +65,8 @@ public class SubmissionService {
     private final SubmissionRespository submissionRespository;
     private final SubmissionDataRepository submissionDataRepository;
 
+    private final AuthenticationManager authManager;
+
     public ResponseEntity<SubmissionResponse> submitFile(MultipartFile file, String input, String lang) throws IOException {
 //        File convertFile = new File("./tmp/" + file.getOriginalFilename());
         String fileName = file.getOriginalFilename();
@@ -68,11 +75,23 @@ public class SubmissionService {
 //        String fileType = fileName.split(".");
         String fileType = splits[1];
         byte[] fileContent = file.getBytes();
+        User user;
+        Boolean anonymous=false;
+        String anonymousId = "";
+        if(SecurityContextHolder.getContext().getAuthentication().getPrincipal() == "anonymousUser")
+        {
+            user = User.builder().name("Anonymous").email("anonymous-"+ UUID.randomUUID() + "email.com").role(Role.USER).password(String.valueOf(UUID.randomUUID())).build();
+            anonymousId = user.getId();
+            anonymous = true;
+        }
+        else
+        {
+            user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        }
 
-        
         var submission = Submission.builder()
                 .submissionStatus("PENDING")
-                .userId("USER1")
+                .userId(user.getId())
                 .filename(fileName)
                 .filetype(fileType)
                 .lang(fileType)
@@ -138,13 +157,14 @@ public class SubmissionService {
             }
         });
 
-        return new ResponseEntity<>(SubmissionResponse.builder().id(submission.getSubmissionId()).message("Submitted Successfully").build(), HttpStatusCode.valueOf(200));
+        return new ResponseEntity<>(SubmissionResponse.builder().id(submission.getSubmissionId()).message("Submitted Successfully").anonymous(anonymous).anonymousId(anonymousId).build(), HttpStatusCode.valueOf(200));
     }
 
     public void successOperation(WorkerResponse workerResponse, String submissionId)
     {
         log.info("Sending worker response across {}", "/topic/message/"+submissionId);
         try {
+            System.out.println(workerResponse);
             template.convertAndSend("/topic/message/" + submissionId, workerResponse);
             log.info("Sent worker response to {}", "/topic/message/"+submissionId);
         } catch (Exception e) {
@@ -153,8 +173,10 @@ public class SubmissionService {
         }
     }
 
-    public ResponseEntity<ListSubmissions> getSubmissionsByUserID(String userID){
+    public ResponseEntity<ListSubmissions> getSubmissionsByUserID(){
         try {
+            User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            String userID = user.getId();
             var submissions = submissionRespository.findAllByUserId(userID);
             return new ResponseEntity<ListSubmissions>(ListSubmissions.builder().submissions(submissions).build(), HttpStatusCode.valueOf(200));
         } catch (Exception e) {

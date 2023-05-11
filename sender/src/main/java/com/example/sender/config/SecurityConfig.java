@@ -40,7 +40,7 @@ public class SecurityConfig {
                 .cors()
                 .disable()
                 .authorizeHttpRequests()
-                .requestMatchers("/api/v1/**")
+                .requestMatchers("/api/v1/**", "/**")
                 .permitAll()
                 .anyRequest()
                 .authenticated()

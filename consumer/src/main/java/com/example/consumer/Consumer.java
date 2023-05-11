@@ -62,6 +62,7 @@ public class Consumer {
             log.info("Compilation and execution completed for submission {}", obj.getId());
             output = Files.readString(Paths.get("out.txt"));
             //return output;
+            System.out.println(output);
             BufferedReader err_reader, timeMem_reader;
             try {
                 err_reader = new BufferedReader(new FileReader("errors.txt"));
@@ -139,7 +140,10 @@ public class Consumer {
 
             processBuilder.command(builderList);
             StopWatch watch = new StopWatch();
+            System.out.println("dsjkdbdjdbbcdnmbd");
+            System.out.println(processBuilder.command());
             Process process = processBuilder.start();
+            System.out.println(process);
             watch.start();
 
             BufferedReader reader
