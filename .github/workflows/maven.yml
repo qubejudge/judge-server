@@ -83,18 +83,20 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Azure Login
+      id: login
       uses: Azure/login@v1.4.6
       with:
         # Paste output of `az ad sp create-for-rbac` as value of secret variable: AZURE_CREDENTIALS
         creds: ${{ secrets.AZURE_CREDENTIALS }}
 
     - name: Azure Kubernetes set context
+      id: set-context
       uses: Azure/aks-set-context@v3.0
       with:
         # Resource Group Name
-        resource-group: ${{ secrets.QUBEJUDGE_RESOURCE_GROUP }}
+        resource-group: ${{ secrets.RESOURCE_GROUP }}
         # AKS Cluster Name
-        cluster-name: ${{ secrets.QUBEJUDGE_CLUSTER }}
+        cluster-name: ${{ secrets.CLUSTER_NAME }}
     - name: Setup kubectl
       id: install-kubectl
       uses: azure/setup-kubectl@v3
