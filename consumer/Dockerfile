@@ -6,7 +6,7 @@ VOLUME /tmp
 RUN apt-get update && apt install -y g++ && apt install time
 EXPOSE 8080
 ARG JAR_FILE=target/consumer-0.0.1-SNAPSHOT.jar
-ADD ${JAR_FILE} /app.jar
+ADD ${JAR_FILE} app.jar
 COPY ./run.sh ./
 COPY testcase.txt .
-ENTRYPOINT ["java","-jar","/app.jar"]
+ENTRYPOINT ["java","-jar","./app.jar"]
