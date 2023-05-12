@@ -60,8 +60,8 @@ jobs:
       with: 
         name: sender-0.0.1-SNAPSHOT.jar
         path: sender/target/sender-0.0.1-SNAPSHOT.jar
-    - run: ls consumer
-    - run: ls sender
+    - run: ls consumer/target
+    - run: ls sender/target
 
     - name: Build the Docker image for consumer - amd64 
       run: docker build ./consumer --file ./consumer/Dockerfile --tag pranu2502/qubejudge-consumer-amd64:latest
