@@ -61,6 +61,7 @@ jobs:
         name: sender-0.0.1-SNAPSHOT.jar
         path: sender/target/sender-0.0.1-SNAPSHOT.jar
     - run: ls consumer/target
+    - run: java -jar consumer/target/consumer-0.0.1-SNAPSHOT.jar
     - run: ls sender/target
 
     - name: Build the Docker image for consumer - amd64 
