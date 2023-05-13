@@ -23,10 +23,10 @@ public class SubmissionController {
     @Autowired
     private final SubmissionService submissionService;
 
-    @GetMapping("/hi")
+    @GetMapping("/hii")
     public ResponseEntity<String> pingEndpoint()
     {
-        return new ResponseEntity<String>("hiiii", HttpStatusCode.valueOf(200));
+        return new ResponseEntity<String>("Hello, World!", HttpStatusCode.valueOf(200));
     }
 
     @PostMapping("/submit-file")
