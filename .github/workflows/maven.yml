@@ -49,9 +49,9 @@ jobs:
         mysql user: qubejudge 
         # MYSQL_PASSWORD - specified superuser password which user is power for created database
         mysql password: qubejudge@sql1 
-    - name: Build sender with Maven
+    - name: Test sender with Maven
       run: mvn test --file ./sender/pom.xml
-    - name: Build consumer with Maven
+    - name: Test consumer with Maven
       run: mvn test --file ./consumer/pom.xml
   build:
 
@@ -66,9 +66,9 @@ jobs:
         distribution: 'temurin'
         cache: maven
     - name: Build sender with Maven
-      run: mvn clean package --file ./sender/pom.xml
+      run: mvn clean package --file ./sender/pom.xml -DskipTests
     - name: Build consumer with Maven
-      run: mvn clean package --file ./consumer/pom.xml
+      run: mvn clean package --file ./consumer/pom.xml -DskipTests
     - run: ls consumer/target
 #     - uses: actions/upload-artifact@master
 #       with:
