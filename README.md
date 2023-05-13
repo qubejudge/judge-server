@@ -12,7 +12,7 @@ Some of the the key features of QubeJudge are:
 -  Supports Addition of new programming languages
 
 ## Architecture
-![QubeJudge Architecture](./docs/architecture.png)
+![QubeJudge Architecture](https://github.com/qubejudge/judge-server/blob/main/docs/architecture.png?raw=true)
 
 
 <!-- ## Deployment Instructions -->
