@@ -86,6 +86,7 @@ public class SubmissionService {
 //        }
 //        else
 //        {
+        System.out.println( SecurityContextHolder.getContext().getAuthentication().getPrincipal());
             user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 //        }
 
