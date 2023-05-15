@@ -126,13 +126,13 @@ public class Consumer {
     private int executeCode(String id, String fileType) throws InterruptedException {
         ProcessBuilder processBuilder
                 = new ProcessBuilder();
-//        Thread.sleep(10000);
+        Thread.sleep(1000);
         List<String> builderList = new ArrayList<String>();
         builderList.add("./run.sh");
         builderList.add(fileType);
         builderList.add("out.txt");
         builderList.add("timeMem.txt");
-        builderList.add("2");
+        builderList.add("10");
         builderList.add("256");
         builderList.add("errors.txt");
 
