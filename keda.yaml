@@ -30,8 +30,8 @@ spec:
   triggers:
     - type: rabbitmq
       metadata:
-        protocol: amqp
+        # protocol: amqp
         queueName: "judge.rpc.requests"
-        queueLength: '5'
+        queueLength: "5"
       authenticationRef:
         name: keda-trigger-auth-rabbitmq-conn

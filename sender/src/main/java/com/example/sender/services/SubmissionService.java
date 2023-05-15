@@ -78,16 +78,16 @@ public class SubmissionService {
         User user;
         Boolean anonymous=false;
         String anonymousId = "";
-        if(SecurityContextHolder.getContext().getAuthentication().getPrincipal() == "anonymousUser")
-        {
-            user = User.builder().name("Anonymous").email("anonymous-"+ UUID.randomUUID() + "email.com").role(Role.USER).password(String.valueOf(UUID.randomUUID())).build();
-            anonymousId = user.getId();
-            anonymous = true;
-        }
-        else
-        {
+//        if(SecurityContextHolder.getContext().getAuthentication().getPrincipal() == "anonymousUser")
+//        {
+//            user = User.builder().name("Anonymous").email("anonymous-"+ UUID.randomUUID() + "email.com").role(Role.USER).password(String.valueOf(UUID.randomUUID())).build();
+//            anonymousId = user.getId();
+//            anonymous = true;
+//        }
+//        else
+//        {
             user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        }
+//        }
 
         var submission = Submission.builder()
                 .submissionStatus("PENDING")
@@ -97,6 +97,7 @@ public class SubmissionService {
                 .lang(fileType)
                 .build();
         try {
+            System.out.println(submission);
             submissionRespository.save(submission);
         } catch (Exception e) {
             // TODO: handle exception
@@ -177,6 +178,7 @@ public class SubmissionService {
         try {
             User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             String userID = user.getId();
+            System.out.println(user.getName());
             var submissions = submissionRespository.findAllByUserId(userID);
             return new ResponseEntity<ListSubmissions>(ListSubmissions.builder().submissions(submissions).build(), HttpStatusCode.valueOf(200));
         } catch (Exception e) {
